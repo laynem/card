@@ -5,8 +5,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Scoundrel</title>
-        <link rel="stylesheet" href="css/reset.css">
         <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/cards.css">
 
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,11 +17,166 @@
     </head>
 
     <body>
-        <h1><span class="material-symbols-outlined">
-            search
-            </span> Scoundrel</h1>
+        <!-- Header -->
+        <header>
+            <h1>Scoundrel</h1>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <div class="playingCards rotateHand">
+                <ul id="dungeon" class="table">
+                    <li><div class="card back">*</div></li>
+                </ul>
+                <ul id="hand" class="table">
+                </ul>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer>
+            <p>&copy; 2023 Scoundrel</p>
+        </footer>
+
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script>
+            $(document).ready(function() {
+                startGame();
+            });
+
+            const cardDeck = {
+                "cards":[
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "2", "rankDisp":"2"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "3", "rankDisp":"3"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "4", "rankDisp":"4"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "5", "rankDisp":"5"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "6", "rankDisp":"6"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "7", "rankDisp":"7"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "8", "rankDisp":"8"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "9", "rankDisp":"9"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "10", "rankDisp":"10"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "2", "rankDisp":"2"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "3", "rankDisp":"3"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "4", "rankDisp":"4"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "5", "rankDisp":"5"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "6", "rankDisp":"6"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "7", "rankDisp":"7"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "8", "rankDisp":"8"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "9", "rankDisp":"9"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "10", "rankDisp":"10"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "2", "rankDisp":"2"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "3", "rankDisp":"3"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "4", "rankDisp":"4"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "5", "rankDisp":"5"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "6", "rankDisp":"6"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "7", "rankDisp":"7"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "8", "rankDisp":"8"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "9", "rankDisp":"9"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "10", "rankDisp":"10"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "j", "rankDisp":"J"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "q", "rankDisp":"Q"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "k", "rankDisp":"K"},
+                    {"suitName":"spades", "suitImage":"♠", "rankName": "a", "rankDisp":"A"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "2", "rankDisp":"2"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "3", "rankDisp":"3"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "4", "rankDisp":"4"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "5", "rankDisp":"5"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "6", "rankDisp":"6"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "7", "rankDisp":"7"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "8", "rankDisp":"8"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "9", "rankDisp":"9"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "10", "rankDisp":"10"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "j", "rankDisp":"J"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "q", "rankDisp":"Q"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "k", "rankDisp":"K"},
+                    {"suitName":"clubs", "suitImage":"♣", "rankName": "a", "rankDisp":"A"}
+                ]
+            }
+
+            var unused = {
+                "cards":[
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "j", "rankDisp":"J"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "q", "rankDisp":"Q"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "k", "rankDisp":"K"},
+                    {"suitName":"diams", "suitImage":"♦", "rankName": "a", "rankDisp":"A"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "j", "rankDisp":"J"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "q", "rankDisp":"Q"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "k", "rankDisp":"K"},
+                    {"suitName":"hearts", "suitImage":"♥", "rankName": "a", "rankDisp":"A"}
+                ]
+            }
+
+            var myDeck = [];
+            var discard = {"cards":[{}]}
+            var equipment = {"cards":[{}]}
+            var myLife = 20;
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function range(start, end, step = 1) {
+                const arr = [];
+                for (let i = start; i < end; i += step) {
+                    arr.push(i);
+                }
+                return arr;
+            }
+
+            
+
+            function startGame() {
+                shuffleMyDeck();
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+            }
+            function shuffleMyDeck() {
+                const numbers = range(1, cardDeck.cards.length);
+                myDeck = shuffleArray(numbers);
+
+                console.log(myDeck);
+            }
+
+            function equipCard(id) {
+                let card = cardDeck["cards"][id];
+                console.log(card);
+                $("ul#hand.table").append(createCard(card, id));
+                equipment.cards.push(card);
+                console.log(equipment);
+            }
+
+            function createCard(card, id) {
+                return "<li><div onclick=\"equipCard("+id+")\" data-id=\""+id+"\" class=\"card rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
+            }
+
+            function getRandomCard() {
+                var obj_keys = Object.keys(cardDeck["cards"]);
+                var ran_key = obj_keys[Math.floor(Math.random() * obj_keys.length)];
+
+                // return {deck["cards"][ran_key];
+                return {"card":cardDeck["cards"][ran_key], "id":ran_key};
+            }
+
+            function dealCard(id) {
+                let deck = {"card":cardDeck["cards"][id], "id":id};
+                $("ul#dungeon.table").append(createCard(deck.card, deck.id));
+            }
+
+            function newDungeon() {
+                dealCard();
+                dealCard();
+                dealCard();
+            }
+
+        </script>
     </body>
 
 </html>
