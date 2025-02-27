@@ -14,7 +14,8 @@
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
         <!-- Material Symbols Outlined -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-        
+        <!-- Animate Css -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
         <!-- Vex -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/css/vex.min.css" integrity="sha512-bSrj+eCIsXO9dQmu+zpSJolzqW9IaxugS6Z16062CYd5t9d/Mg3Uys9KkYvbLOV1VlkHaIkmx+b9jWi3YI0FXQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/css/vex-theme-plain.min.css" integrity="sha512-uJKiqjgSolUBZgCBkiucKjcA2QuYxU0I0zljEhpCtsQK5fGFxrrn7+Bhri0kFJJz5AIkIENwvzOApkxF45y8sw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -51,6 +52,11 @@
                     </ul>
                 </div>
                 <div class="playingCards rotateHand">
+                    <label class="dungeon">
+                        <span class="material-symbols-sharp">
+                        castle
+                        </span> The Dungeon
+                    </label>
                     <ul id="dungeon" class="table">
                         <li><div class="card back">*</div></li>
                     </ul>
@@ -60,7 +66,10 @@
                     </ul>
                 </div>
             </div>
-            <div id="player">
+            <div id="notification">
+                <div class="animate__animated animate__slideInUp">Welcome to Scoundrel, a rogue-like solo card game.</div>
+            </div>
+            <div id="player" class="hidden">
                 <ul>
                     <li>HP: <span id="hp" data-hp="0"></span></li>
                     <li>Cards Remaining: <span id="cardsRemaining"></span></li>
@@ -74,7 +83,7 @@
                     <li>Debug: <span id="debug"></span></li>
                 </ul>
             </div>
-            <div id="debugger">
+            <div id="debugger" class="hidden">
                 <ul></ul>
             </div>
         </main>
@@ -172,7 +181,7 @@
             var myKilledMinions = 0;
             var myMaxMinions = 99;
             var myPotion = false;
-            var debug = true;
+            var debug = false;
         </script>
     </body>
 

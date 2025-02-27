@@ -65,18 +65,41 @@ li {
     margin:0;
     padding:0;
 }
-
+div.playingCards {
+    position: relative;
+}
 div.card { 
     cursor: pointer; 
 }
-
+label.dungeon {
+    font-size: 39px;
+    position: absolute;
+    top: -4.0vh;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    opacity: 0.3;
+    text-align: right;
+    right: 6px;
+}
+label.dungeon span {
+    font-weight: 900;
+    font-size: 35px;
+    vertical-align: middle;
+    margin-bottom: 7px;
+}
 li#minion {
     margin-left: -60px;
     margin-top: 10px;
 }
 
 div#debugger {
-    visibility: hidden;
+    height: 200px;
+    overflow-y: scroll;
+    margin-top: 10vh;
+    border: 1px solid #ccc;
+    padding: ;
+    display: flex;
 }
 
 div#container {
@@ -97,7 +120,7 @@ div.ui span.material-symbols-sharp {
 }
 
 .hidden {
-    display: none; 
+    display: none !important; 
 }
 
 .playingCards .card.shadowless {

@@ -7,7 +7,7 @@ function setDebug() {
 }
 function debugMessage(message) {
     if(debug) {
-        $("div#debugger ul").append("<li>"+message+"</li>")
+        $("div#debugger ul").prepend("<li>"+message+"</li>")
     }
 }
 
@@ -31,24 +31,17 @@ function range(start, end, step = 1) {
     return arr;
 }
 
+/**** NOTIFICATIONS ****/
+function notification(message) {
+    $("#notification").text(message);
+}
+
 /**** SET VARIABLES ****/
-function setHP(hp) {
+function setHP() {
     debugMessage("=== SET HP ===");
-    debugMessage("HP: "+hp);
-    // HP cannot exceed 20
-    if(hp > 20) {
-        hp = 20;
-    }
-    // Set game variable
-    debugMessage("myLife: "+hp);
-    myLife = hp;
     // Write hp to game
-    $("#hp").text(hp);
-    if(hp <= 0 && gameStart) {
-        debugMessage("Game Over: "+hp);
-        vex.dialog.alert('GAME OVER!');
-        exit;
-    }
+    $("#hp").text(myLife);
+    debugMessage("Data: " + myLife);
     debugMessage("=== SET HP ===");
 }
 
@@ -121,7 +114,7 @@ function startGame() {
     debugMessage("=== START GAME ===");
     setDebug();
     shuffleMyDeck();
-    setHP(myLife);
+    setHP();
     setCardsRemaining();
     setFlee();
     setMyDamage();
@@ -316,19 +309,36 @@ function equipCard(id) {
 }
 
 function potionCard(id) {
+    debugMessage("=== USE POTION CARD ===");
     let card = cardDeck["cards"][id];
-    let heal = card.rankName;
-    // Heal
-    if(!myPotion) { // You only can use one potion per dungeon
-        setHP(Number(myLife) + Number(heal));
-    } 
-    // Remove Item From Dungeon
-    myDungeon = myDungeon.filter(item => item !== Number(id));
-    removeCard(id);
-    // Move card to discard
-    $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
-    myPotion = true;
-    setPotion();
+    if(!myPotion) {
+        debugMessage("=== POTION USE ACCEPTED ===");
+        var message;
+        
+        let heal = card.rankName;
+        debugMessage("Heal: " + heal);
+        // Heal
+        calculateHealth(heal, 0);
+        // Remove Item From Dungeon
+        myDungeon = myDungeon.filter(item => item !== Number(id));
+        removeCard(id);
+        // Move card to discard
+        $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
+        myPotion = true;
+        setPotion();
+    } else {
+        debugMessage("=== POTION USE FAILED ===");
+        debugMessage("id: " + id);
+        debugMessage("card: " + card);
+        // Remove Item From Dungeon
+        myDungeon = myDungeon.filter(item => item !== Number(id));
+        removeCard(id);
+        // Move card to discard
+        $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
+        message = "You are unable to use any more health potions in this dungeon.";
+        notification(message);
+    }
+    debugMessage("=== USE POTION CARD END ===");
 }
 
 function newEquipCard() {
@@ -355,18 +365,46 @@ function newEquipCard() {
     setMyMaxMinions();
 }
 
+function calculateHealth(change, type) {
+    if(type == 0) { 
+        // You Healed
+        var previousLife = Number(myLife);
+        myLife = Number(myLife) + Number(change);
+        if(myLife > 20) { 
+            myLife = 20; // Cannot exceed 20
+        }
+        var heal = myLife - previousLife;
+        var message = "You have been healed for "+heal+" HP.";
+        notification(message);
+    } else {
+        // You took damage
+        myLife = Number(myLife) - Number(change);
+        var message = "You took "+change+" damage.";
+        notification(message);
+    }
+    // Update HP Number
+    setHP(); 
+    // Check to see if you died
+    if(Number(myLife) <= 0) {
+        vex.closeAll();
+        vex.dialog.alert('GAME OVER!');
+        exit;
+    }
+}
+
 function calculateWeaponDamage(minionDamage) {
     var damage = 0;
     if(minionDamage > myDamage) {
         damage = minionDamage - myDamage;
     }
-    var hp = Number(myLife) - Number(damage);
-    setHP(hp);
+    if(damage < 0) {
+        damage = 0;
+    }
+    calculateHealth(damage, 1);
 }
 
 function calculateHandDamage(minionDamage) {
-    var hp = Number(myLife) - Number(minionDamage);
-    setHP(hp);
+    calculateHealth(minionDamage, 1);
 }
 
 function blankCard() {
