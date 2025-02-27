@@ -51,6 +51,39 @@ footer {
     font-weight: bold;
 }
 
+main { 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+li#minion {
+    margin-left: -60px;
+    margin-top: 10px;
+}
+
 .hidden {
     display: none; 
+}
+
+.playingCards .card.shadowless {
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+.playingCards .card.back.plain {
+    background-color: #fff;
+    background-image: none;
+}
+.playingCards .card.back.discard {
+    background-image: none;
+    -webkit-box-shadow: none;
+}
+.playingCards .card.back.spacer {
+    background-color: transparent;
+    background-image: none;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    border: 0;
 }

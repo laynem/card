@@ -14,6 +14,10 @@
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
         <!-- Material Symbols Outlined -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+        <!-- Vex -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/css/vex.min.css" integrity="sha512-bSrj+eCIsXO9dQmu+zpSJolzqW9IaxugS6Z16062CYd5t9d/Mg3Uys9KkYvbLOV1VlkHaIkmx+b9jWi3YI0FXQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/css/vex-theme-plain.min.css" integrity="sha512-uJKiqjgSolUBZgCBkiucKjcA2QuYxU0I0zljEhpCtsQK5fGFxrrn7+Bhri0kFJJz5AIkIENwvzOApkxF45y8sw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
     </head>
 
     <body>
@@ -29,9 +33,21 @@
                     <li><div class="card back">*</div></li>
                 </ul>
                 <ul id="hand" class="table">
+                    <li id="discard"><div class="card back discard">*</div></li>
+                    <li id="equipment"><div class="card back shadowless plain">*</div></li>
                 </ul>
             </div>
-
+            <div id="player">
+                <ul>
+                    <li>HP: <span id="hp" data-hp="0"></span></li>
+                    <li>Cards Remaining: <span id="cardsRemaining"></span></li>
+                    <li>Damage: <span id="damage"></span></li>
+                    <li>Max Minion: <span id="maxMinion"></span></li>
+                    <li>Flee: <span id="flee"></span></li>
+                    <li>Minions Killed: <span id="minionsKilled"></span></li>
+                    <li>Dungeon Cleared: <span id="dungeonCleared"></span></li>
+                </ul>
+            </div>
         </main>
 
         <!-- Footer -->
@@ -41,11 +57,29 @@
 
         <!-- jQuery -->
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <!-- Vex -->   
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/js/vex.min.js" integrity="sha512-qU0PChDrIKPBhT0pJpD5yw3HtJYekKiJa1cl92tjKCCwLNOj5AZ/PGzxI5qIDmyIbk/6nK3vrEWshYozID56UA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/js/vex.combined.min.js" integrity="sha512-9ZP47jSudEgrUZA1Z3VOWIJFxHCfkJlarrrQxVdPH/vVtoAwD84AS8lmiv0hizWQvFkwAUnYZA/nehKRP5EFUg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>vex.defaultOptions.className = 'vex-theme-plain'</script>
+        <script src="js/game.js"></script>
         <script>
             $(document).ready(function() {
-                startGame();
+                shuffleMyDeck();
+                setHP(myLife);
+                setCardsRemaining();
+                setFlee();
+                setMyDungeons();
+                setMyMinions();
+                setMyMaxMinions();
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+                dealCard(myDeck.shift(0));
+                gameStart = true;
             });
 
+            /** Game Variables **/
+            // Standard Card Deck
             const cardDeck = {
                 "cards":[
                     {"suitName":"diams", "suitImage":"♦", "rankName": "2", "rankDisp":"2"},
@@ -94,8 +128,8 @@
                     {"suitName":"clubs", "suitImage":"♣", "rankName": "a", "rankDisp":"A"}
                 ]
             }
-
-            var unused = {
+            // Cards Removed from Standard Card Deck
+            const unused = {
                 "cards":[
                     {"suitName":"diams", "suitImage":"♦", "rankName": "j", "rankDisp":"J"},
                     {"suitName":"diams", "suitImage":"♦", "rankName": "q", "rankDisp":"Q"},
@@ -108,73 +142,17 @@
                 ]
             }
 
+            var gameStart = false;
             var myDeck = [];
-            var discard = {"cards":[{}]}
-            var equipment = {"cards":[{}]}
+            var myDiscard = [];
+            var myEquipment = [];
+            var myDungeon = [];
             var myLife = 20;
-
-            function shuffleArray(array) {
-                for (let i = array.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [array[i], array[j]] = [array[j], array[i]];
-                }
-                return array;
-            }
-
-            function range(start, end, step = 1) {
-                const arr = [];
-                for (let i = start; i < end; i += step) {
-                    arr.push(i);
-                }
-                return arr;
-            }
-
-            
-
-            function startGame() {
-                shuffleMyDeck();
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
-            }
-            function shuffleMyDeck() {
-                const numbers = range(1, cardDeck.cards.length);
-                myDeck = shuffleArray(numbers);
-
-                console.log(myDeck);
-            }
-
-            function equipCard(id) {
-                let card = cardDeck["cards"][id];
-                console.log(card);
-                $("ul#hand.table").append(createCard(card, id));
-                equipment.cards.push(card);
-                console.log(equipment);
-            }
-
-            function createCard(card, id) {
-                return "<li><div onclick=\"equipCard("+id+")\" data-id=\""+id+"\" class=\"card rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
-            }
-
-            function getRandomCard() {
-                var obj_keys = Object.keys(cardDeck["cards"]);
-                var ran_key = obj_keys[Math.floor(Math.random() * obj_keys.length)];
-
-                // return {deck["cards"][ran_key];
-                return {"card":cardDeck["cards"][ran_key], "id":ran_key};
-            }
-
-            function dealCard(id) {
-                let deck = {"card":cardDeck["cards"][id], "id":id};
-                $("ul#dungeon.table").append(createCard(deck.card, deck.id));
-            }
-
-            function newDungeon() {
-                dealCard();
-                dealCard();
-                dealCard();
-            }
+            var myFlee = false;
+            var myDamage = 0;
+            var myDungeons = 0;
+            var myMinions = 0;
+            var myMaxMinions = 99;
 
         </script>
     </body>
