@@ -44,8 +44,10 @@
                     <li>Damage: <span id="damage"></span></li>
                     <li>Max Minion: <span id="maxMinion"></span></li>
                     <li>Flee: <span id="flee"></span></li>
+                    <li>Potion: <span id="myPotion"></span></li>
                     <li>Minions Killed: <span id="minionsKilled"></span></li>
                     <li>Dungeon Cleared: <span id="dungeonCleared"></span></li>
+                    <li>Dungeon Cards: <span id="dungeonCards"></span></li>
                 </ul>
             </div>
         </main>
@@ -71,10 +73,7 @@
                 setMyDungeons();
                 setMyMinions();
                 setMyMaxMinions();
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
-                dealCard(myDeck.shift(0));
+                startDungeon();
                 gameStart = true;
             });
 
@@ -153,6 +152,7 @@
             var myDungeons = 0;
             var myMinions = 0;
             var myMaxMinions = 99;
+            var myPotion = false;
 
         </script>
     </body>

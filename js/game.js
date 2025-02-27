@@ -35,6 +35,10 @@ function setFlee() {
     if(myFlee) { $("#flee").text("Can't Flee"); } else { $("#flee").text("Can Flee"); }
 }
 
+function setPotion() {
+    if(myPotion) { $("#myPotion").text("Can't Potion"); } else { $("#myPotion").text("Can Potion"); }
+}
+
 function setMyDungeons() {
     $("#dungeonCleared").text(myDungeons);
 }
@@ -50,6 +54,10 @@ function setMyDamage() {
 function setMyMaxMinions() {
     $("#maxMinion").text(myMaxMinions);
 }   
+
+function setMyDungeon() {
+    $("#dungeonCards").text(JSON.stringify(myDungeon));
+}
 
 function startGame() {
     shuffleMyDeck();
@@ -97,59 +105,9 @@ function removeCard(id) {
 function discardCard(id) {
 }
 
-function equipCard(id) {
-    let card = cardDeck["cards"][id];
-    // Set your new damage
-    let cardRank = convertRank(card.rankName);
-    myDamage = cardRank;
-    setMyDamage();
-    // Remove Item From Dungeon
-    myDungeon = myDungeon.filter(item => item !== id);
-    removeCard(id);
-    // Move Equipment To Discard if Already Equipped
-    if($("ul#hand.table li#equipment > div").attr("data-id") !== undefined) {
-        let cardID = $("ul#hand.table li#equipment > div").attr("data-id"); // Currently equipped card
-        let discardCard = unusedCard(cardID);
-        $("ul#hand.table li#discard").replaceWith(discardCard);
-    }
-    // Move equipement to hand
-    $("ul#hand.table li#equipment").replaceWith(createEquipmentCard(card, id));
-    // Move equipment to equipment array
-    myEquipment.push(id); 
-}
-
-function potionCard(id) {
-    let card = cardDeck["cards"][id];
-    let heal = Number(card.rankName);
-    let hp = Number($("#hp").attr("data-hp"));
-    // Heal
-    setHP(hp + heal);
-    // Remove Item From Dungeon
-    myDungeon = myDungeon.filter(item => item !== id);
-    removeCard(id);
-    // Move card to discard
-    $("ul#hand.table li#discard").replaceWith(createEquipmentCard(card, id));
-}
-
-function calculateWeaponDamage(minionDamage) {
-    var damage = 0;
-    if(minionDamage > myDamage) {
-        damage = minionDamage - myDamage;
-    }
-    var hp = Number(myLife) - Number(damage);
-    setHP(hp);
-}
-
-function calculateHandDamage(minionDamage) {
-    var hp = Number(myLife) - Number(minionDamage);
-    setHP(hp);
-}
-
 function minionCard(id) {
     let card = cardDeck["cards"][id];
-    console.log("Rank: "+card.rankName);
     let cardRank = convertRank(card.rankName);
-    console.log("Convert: "+cardRank);
     // Check max minion rank
     if(myMaxMinions > cardRank) {
         // Check equipment
@@ -168,7 +126,7 @@ function minionCard(id) {
                         click: function () {
                             calculateWeaponDamage(cardRank);
                             // Remove minion card from dungeon
-                            myDungeon = myDungeon.filter(item => item !== id);
+                            myDungeon = myDungeon.filter(item => item !== Number(id));
                             removeCard(id);
                             // Add minion card to hand
                             $("ul#hand.table").append(createMinionCard(card, id));
@@ -185,10 +143,18 @@ function minionCard(id) {
                         click: function () {
                             calculateHandDamage(cardRank);
                             // Remove minion card from dungeon
-                            myDungeon = myDungeon.filter(item => item !== id);
+                            myDungeon = myDungeon.filter(item => item !== Number(id));
                             removeCard(id);
                             // Move card to discard
-                            $("ul#hand.table li#discard").replaceWith(discardMinionCard(card, id));
+                            $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
+                            vex.close(this);
+                        }
+                    },
+                    {
+                        type: "button",
+                        text: "Cancel",
+                        class: "vex-dialog-button-primary",
+                        click: function () {
                             vex.close(this);
                         }
                     }
@@ -210,10 +176,10 @@ function minionCard(id) {
                         click: function () {
                             calculateHandDamage(cardRank);
                             // Remove minion card from dungeon
-                            myDungeon = myDungeon.filter(item => item !== id);
+                            myDungeon = myDungeon.filter(item => item !== Number(id));
                             removeCard(id);
                             // Move card to discard
-                            $("ul#hand.table li#discard").replaceWith(discardMinionCard(card, id));
+                            $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
                             vex.close(this);
                         }
                     },
@@ -243,10 +209,10 @@ function minionCard(id) {
                     click: function () {
                         calculateHandDamage(cardRank);
                         // Remove minion card from dungeon
-                        myDungeon = myDungeon.filter(item => item !== id);
+                        myDungeon = myDungeon.filter(item => item !== Number(id));
                         removeCard(id);
                         // Move card to discard
-                        $("ul#hand.table li#discard").replaceWith(discardMinionCard(card, id));
+                        $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
                         vex.close(this);
                     }
                 },
@@ -262,6 +228,78 @@ function minionCard(id) {
             callback: function (value) { }
         })
     }
+}
+
+function equipCard(id) {
+    let card = cardDeck["cards"][id];
+    // Set your new damage
+    let cardRank = convertRank(card.rankName);
+    myDamage = cardRank;
+    setMyDamage();
+    // Remove Item From Dungeon
+    myDungeon = myDungeon.filter(item => item !== Number(id));
+    removeCard(id);
+    // Move Equipment To Discard if Already Equipped
+    newEquipCard();
+    console.log("Equipment: "+ id);
+    // Move equipement to hand
+    $("ul#hand.table li#equipment").replaceWith(createEquipmentCard(card, id));
+    // Move equipment to equipment array
+    myEquipment.push(id); 
+}
+
+function potionCard(id) {
+    let card = cardDeck["cards"][id];
+    let heal = card.rankName;
+    let hp = $("#hp").attr("data-hp");
+    // Heal
+    if(!myPotion) { // You only can use one potion per dungeon
+        setHP(Number(hp) + Number(heal));
+    } 
+    // Remove Item From Dungeon
+    myDungeon = myDungeon.filter(item => item !== Number(id));
+    removeCard(id);
+    // Move card to discard
+    $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
+    myPotion = true;
+    setPotion();
+}
+
+function newEquipCard() {
+    console.log("newEquipCard");
+    var cardid;
+    
+    cardid = $("ul#hand.table li#equipment div").attr("data-id");
+    if(cardid) {
+        myDiscard.push(Number(cardid));
+        myEquipment = myEquipment.filter(item => item !== Number(cardid));
+        console.log(myEquipment);
+        console.log("Equip: "+cardid);
+    }
+
+    $("ul#hand.table li#minion div").each(function() {
+        cardid = $(this).attr("data-id");
+        myDiscard.push(cardid);
+        $(this).parent().remove();
+        console.log("Minion: "+cardid);
+    });
+
+    // Reset Max Minion
+    myMaxMinions = 99;
+}
+
+function calculateWeaponDamage(minionDamage) {
+    var damage = 0;
+    if(minionDamage > myDamage) {
+        damage = minionDamage - myDamage;
+    }
+    var hp = Number(myLife) - Number(damage);
+    setHP(hp);
+}
+
+function calculateHandDamage(minionDamage) {
+    var hp = Number(myLife) - Number(minionDamage);
+    setHP(hp);
 }
 
 function blankCard() {
@@ -281,11 +319,15 @@ function createEquipmentCard(card, id) {
     return "<li id=\"equipment\"><div onclick=\"cardAction("+id+")\" data-id=\""+id+"\" class=\"card shadowless rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
 }
 
+function discardEquipmentCard(card, id) {
+    return "<li id=\"discard\"><div data-id=\""+id+"\" class=\"card shadowless rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
+}
+
 function createMinionCard(card, id) {
     return "<li id=\"minion\"><div data-id=\""+id+"\" class=\"card shadowless rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
 }
 
-function discardMinionCard(card, id) {
+function discardCard(card, id) {
     return "<li id=\"discard\"><div data-id=\""+id+"\" class=\"card shadowless rank-"+card.rankName+" "+card.suitName+"\"><span class=\"rank\">"+card.rankDisp+"</span><span class=\"suit\">"+card.suitImage+"</span></div></li>";
 }
 
@@ -318,7 +360,6 @@ function getRandomCard() {
 
 function dealCard(id) {
     let deck = {"card":cardDeck["cards"][id], "id":id};
-    myDungeon.push(id); // Add card to dungeon
     $("ul#dungeon.table").append(createCard(deck.card, deck.id));
 }
 
@@ -341,4 +382,26 @@ function newDungeon() {
         console.log("card id: "+element);
         dealCard(element);
     });
+    myPotion = false;
+    setPotion();
+    setMyDungeon();
+    setCardsRemaining();
+    
+}
+
+function startDungeon() {
+    // Load new ids into dungeon
+    for(var i = 0; i < 4; i++) {
+        myDungeon.push(myDeck.shift(0));
+    }
+    console.log(myDungeon);
+    // Deal out each card from myDungeon array
+    myDungeon.forEach(element => {
+        console.log("card id: "+element);
+        dealCard(element);
+    });
+    myPotion = false;
+    setPotion();
+    setMyDungeon();
+    setCardsRemaining();
 }
