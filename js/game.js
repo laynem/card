@@ -1,8 +1,25 @@
+/**** DEBUGGER ****/
+function setDebug() {
+    $("#debug").text(debug);
+    if(debug) {
+        $("div#debugger").css("visibility", "visible");
+    }
+}
+function debugMessage(message) {
+    if(debug) {
+        $("div#debugger ul").append("<li>"+message+"</li>")
+    }
+}
+
+/**** SHUFFLE CARDS ****/
 function shuffleArray(array) {
+    debugMessage("=== SHUFFLE ARRAY START ===");
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
+    debugMessage("Data:" + array);
+    debugMessage("=== SHUFFLE ARRAY END ===");
     return array;
 }
 
@@ -14,62 +31,105 @@ function range(start, end, step = 1) {
     return arr;
 }
 
+/**** SET VARIABLES ****/
 function setHP(hp) {
+    debugMessage("=== SET HP ===");
+    debugMessage("HP: "+hp);
+    // HP cannot exceed 20
     if(hp > 20) {
         hp = 20;
     }
-    $("#hp").text(hp);
-    $("#hp").attr("data-hp", hp);
+    // Set game variable
+    debugMessage("myLife: "+hp);
     myLife = hp;
-
+    // Write hp to game
+    $("#hp").text(hp);
     if(hp <= 0 && gameStart) {
+        debugMessage("Game Over: "+hp);
         vex.dialog.alert('GAME OVER!');
+        exit;
     }
+    debugMessage("=== SET HP ===");
 }
 
 function setCardsRemaining() {
+    debugMessage("=== SET CARDS REMAINING IN DECK ===");
+    // Cards remaining in my deck
     $("#cardsRemaining").text(myDeck.length);
+    debugMessage("Data: " + myDeck.length);
+    debugMessage("=== SET CARDS REMAINING IN DECK END ===");
 }
 
 function setFlee() {
-    if(myFlee) { $("#flee").text("Can't Flee"); } else { $("#flee").text("Can Flee"); }
+    debugMessage("=== SET FLEE STATUS ===");
+    // You can cannot flee from back to back dungeons
+    if(myFlee) { $("#flee").text("NO"); } else { $("#flee").text("YES"); }
+    debugMessage("Data: " + myFlee);
+    debugMessage("=== SET FLEE STATUS END ===");
 }
 
 function setPotion() {
+    debugMessage("=== SET POTION STATUS ===");
+    // You can only use one potion in each dungeon, any other potion used is discarded
     if(myPotion) { $("#myPotion").text("Can't Potion"); } else { $("#myPotion").text("Can Potion"); }
+    debugMessage("Data: " + myPotion);
+    debugMessage("=== SET POTION STATUS END ===");
 }
 
 function setMyDungeons() {
+    debugMessage("=== SET DUNGEONS RUN ===");
+    // Dungeons cleared
     $("#dungeonCleared").text(myDungeons);
+    debugMessage("Data: " + myDungeons);
+    debugMessage("=== SET DUNGEONS RUN END ===");
 }
 
-function setMyMinions() {
-    $("#minionsKilled").text(myMinions);
+
+function setMyKilledMinions() {
+    debugMessage("=== SET KILLED MINIONS ===");
+    // Minions killed
+    $("#minionsKilled").text(myKilledMinions);
+    debugMessage("Data: " + myKilledMinions);
+    debugMessage("=== SET KILLED MINIONS END ===");
 }
 
 function setMyDamage() {
+    debugMessage("=== SET DAMAGE ===");
+    // Current Weapon Damage
     $("#damage").text(myDamage);
+    debugMessage("Data: " + myDamage);
+    debugMessage("=== SET DAMAGE END ===");
 }
 
 function setMyMaxMinions() {
+    debugMessage("=== SET MAX MINION DAMAGE ===");
+    // The max minion rank 
     $("#maxMinion").text(myMaxMinions);
+    debugMessage("Data: " + myMaxMinions);
+    debugMessage("=== SET MAX MINION DAMAGE END ===");
 }   
 
 function setMyDungeon() {
+    debugMessage("=== SET DUNGEON CARDS ===");
+    // Current cards in the dungeon
     $("#dungeonCards").text(JSON.stringify(myDungeon));
+    debugMessage("Data: " + JSON.stringify(myDungeon));
+    debugMessage("=== SET DUNGEON CARDS END ===");
 }
 
 function startGame() {
+    debugMessage("=== START GAME ===");
+    setDebug();
     shuffleMyDeck();
     setHP(myLife);
     setCardsRemaining();
     setFlee();
+    setMyDamage();
     setMyDungeons();
-    setMyMinions();
-    dealCard(myDeck.shift(0));
-    dealCard(myDeck.shift(0));
-    dealCard(myDeck.shift(0));
-    dealCard(myDeck.shift(0));
+    setMyKilledMinions();
+    setMyMaxMinions();
+    startDungeon();
+    gameStart = true;
 }
 
 function shuffleMyDeck() {
@@ -106,11 +166,16 @@ function discardCard(id) {
 }
 
 function minionCard(id) {
+    debugMessage("=== MINION CARD SELECTED ===");
     let card = cardDeck["cards"][id];
+    debugMessage("MINION CARD: "+card);
     let cardRank = convertRank(card.rankName);
-    // Check max minion rank
-    if(myMaxMinions > cardRank) {
+    debugMessage("MINION CARD RANK: "+cardRank);
+    // Check max minion rankv
+    debugMessage("MAX MINION RANK: "+myMaxMinions);
+    if(Number(myMaxMinions) > Number(cardRank)) {
         // Check equipment
+        debugMessage("HAS EQUIP: "+myEquipment.length);
         if(myEquipment.length > 0) { // Has A Weapon
             // Has a weapon
             // Ask if user wants to defend with weapon or hand
@@ -165,7 +230,7 @@ function minionCard(id) {
             // No weapon
             // Ask if user wants to defend with weapon or hand
             vex.dialog.confirm({
-                message: 'This minion is too strong for you. What do you want to fight this minion with your hand?',
+                message: 'You have no weapon to defend with. What do you want to fight this minion with your hand?',
                 escapeButtonCloses: false,
                 overlayClosesOnClick: false,
                 buttons: [
@@ -207,13 +272,14 @@ function minionCard(id) {
                     text: "Hand",
                     class: "vex-dialog-button-primary",
                     click: function () {
+                        vex.close(this);
                         calculateHandDamage(cardRank);
                         // Remove minion card from dungeon
                         myDungeon = myDungeon.filter(item => item !== Number(id));
                         removeCard(id);
                         // Move card to discard
                         $("ul#hand.table li#discard").replaceWith(discardCard(card, id));
-                        vex.close(this);
+                        
                     }
                 },
                 {
@@ -228,6 +294,7 @@ function minionCard(id) {
             callback: function (value) { }
         })
     }
+    debugMessage("=== MINION CARD SELECTED END ===");
 }
 
 function equipCard(id) {
@@ -251,10 +318,9 @@ function equipCard(id) {
 function potionCard(id) {
     let card = cardDeck["cards"][id];
     let heal = card.rankName;
-    let hp = $("#hp").attr("data-hp");
     // Heal
     if(!myPotion) { // You only can use one potion per dungeon
-        setHP(Number(hp) + Number(heal));
+        setHP(Number(myLife) + Number(heal));
     } 
     // Remove Item From Dungeon
     myDungeon = myDungeon.filter(item => item !== Number(id));
@@ -286,6 +352,7 @@ function newEquipCard() {
 
     // Reset Max Minion
     myMaxMinions = 99;
+    setMyMaxMinions();
 }
 
 function calculateWeaponDamage(minionDamage) {
