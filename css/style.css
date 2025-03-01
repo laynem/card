@@ -98,7 +98,7 @@ div#debugger {
     overflow-y: scroll;
     margin-top: 10vh;
     border: 1px solid #ccc;
-    padding: ;
+    padding: 0;
     display: flex;
 }
 
