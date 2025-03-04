@@ -30,61 +30,70 @@
 
         <!-- Main Content -->
         <main>
-            <div id="container">
-                <div class="ui">
+            <div id="board">
+                <div id="container">
+                    <div class="ui">
+                        <ul>
+                            <li>
+                                <span class="material-symbols-sharp">favorite</span> 
+                                <span id="hp" data-hp="0"></span>
+                            </li>
+                            <li>
+                                <span class="material-symbols-sharp">swords</span> 
+                                <span id="damage"></span>
+                            </li>
+                            <li>
+                                <span class="material-symbols-sharp">medical_services</span>
+                                <span id="myPotion"></span>
+                            </li>
+                            <li>
+                                <span class="material-symbols-sharp">directions_run</span> 
+                                <span id="flee"></span>
+                            </li>
+                            <li>
+                                <span class="material-symbols-sharp">playing_cards</span> 
+                                <span id="cardsRemaining"></span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="table">
+                        <ul id="dungeon">
+                            <playing-card id="deck" rank="0" backcolor="green" backtext=" "></playing-card>
+                        </ul>
+                        <ul id="hand">
+                            <playing-card id="discard" rank="0" backcolor="white" backtext=" "></playing-card>
+                            <playing-card id="equipment" rank="0" backcolor="white" backtext=" "></playing-card>
+                        </ul>
+                    </div>
+                </div>
+                <div id="notification">
+                    <div></div>
+                </div>
+                <div id="player" class="hidden">
                     <ul>
-                        <li>
-                            <span class="material-symbols-sharp">favorite</span> 
-                            <span id="hp" data-hp="0"></span>
-                        </li>
-                        <li>
-                            <span class="material-symbols-sharp">swords</span> 
-                            <span id="damage"></span>
-                        </li>
-                        <li>
-                            <span class="material-symbols-sharp">directions_run</span> 
-                            <span id="flee"></span>
-                        </li>
-                        <li>
-                            <span class="material-symbols-sharp">playing_cards</span> 
-                            <span id="cardsRemaining"></span>
-                        </li>
-                    </ul>
-                </div>
-                <div class="playingCards rotateHand">
-                    <label class="dungeon">
-                        <span class="material-symbols-sharp">
-                        castle
-                        </span> The Dungeon
-                    </label>
-                    <ul id="dungeon" class="table">
-                        <li><div class="card back">*</div></li>
-                    </ul>
-                    <ul id="hand" class="table">
-                        <li id="discard"><div class="card back discard">*</div></li>
-                        <li id="equipment"><div class="card back shadowless plain">*</div></li>
+                        <li>HP: <span id="hp" data-hp="0"></span></li>
+                        <li>Cards Remaining: <span id="cardsRemaining"></span></li>
+                        <li>Damage: <span id="damage"></span></li>
+                        <li>Max Minion: <span id="maxMinion"></span></li>
+                        <li>Flee: <span id="flee"></span></li>
+                        <li>Potion: <span id="myPotion"></span></li>
+                        <li>Minions Killed: <span id="minionsKilled"></span></li>
+                        <li>Dungeon Cleared: <span id="dungeonCleared"></span></li>
+                        <li>Dungeon Cards: <span id="dungeonCards"></span></li>
+                        <li>Debug: <span id="debug"></span></li>
                     </ul>
                 </div>
             </div>
-            <div id="notification">
-                <div class="animate__animated animate__slideInUp">Welcome to Scoundrel, a rogue-like solo card game.</div>
-            </div>
-            <div id="player" class="hidden">
+            
+            <div id="tools">
+                <div id="debugger">
+                    <ul></ul>
+                </div>
                 <ul>
-                    <li>HP: <span id="hp" data-hp="0"></span></li>
-                    <li>Cards Remaining: <span id="cardsRemaining"></span></li>
-                    <li>Damage: <span id="damage"></span></li>
-                    <li>Max Minion: <span id="maxMinion"></span></li>
-                    <li>Flee: <span id="flee"></span></li>
-                    <li>Potion: <span id="myPotion"></span></li>
-                    <li>Minions Killed: <span id="minionsKilled"></span></li>
-                    <li>Dungeon Cleared: <span id="dungeonCleared"></span></li>
-                    <li>Dungeon Cards: <span id="dungeonCards"></span></li>
-                    <li>Debug: <span id="debug"></span></li>
+                    <li><span class="material-symbols-sharp" onclick="startGame();">sync</span></li>
+                    <li><span class="material-symbols-sharp">info</span></li>
+                    <li><span class="material-symbols-sharp toggle-off" onclick="toggleDebug();">toggle_off</span></li>
                 </ul>
-            </div>
-            <div id="debugger" class="hidden">
-                <ul></ul>
             </div>
         </main>
 
@@ -99,90 +108,85 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/js/vex.min.js" integrity="sha512-qU0PChDrIKPBhT0pJpD5yw3HtJYekKiJa1cl92tjKCCwLNOj5AZ/PGzxI5qIDmyIbk/6nK3vrEWshYozID56UA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/vex-js/4.1.0/js/vex.combined.min.js" integrity="sha512-9ZP47jSudEgrUZA1Z3VOWIJFxHCfkJlarrrQxVdPH/vVtoAwD84AS8lmiv0hizWQvFkwAUnYZA/nehKRP5EFUg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script>vex.defaultOptions.className = 'vex-theme-plain'</script>
+        <script src="js/elements.cardmeister.full.js"></script>
         <script src="js/game.js"></script>
         <script>
             $(document).ready(function() {
+                // Set Default Values
+                defaultValues();
+                // Start Game
                 startGame();
             });
 
-            /** Game Variables **/
             // Standard Card Deck
             const cardDeck = {
                 "cards":[
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "2", "rankDisp":"2"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "3", "rankDisp":"3"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "4", "rankDisp":"4"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "5", "rankDisp":"5"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "6", "rankDisp":"6"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "7", "rankDisp":"7"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "8", "rankDisp":"8"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "9", "rankDisp":"9"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "10", "rankDisp":"10"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "2", "rankDisp":"2"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "3", "rankDisp":"3"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "4", "rankDisp":"4"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "5", "rankDisp":"5"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "6", "rankDisp":"6"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "7", "rankDisp":"7"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "8", "rankDisp":"8"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "9", "rankDisp":"9"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "10", "rankDisp":"10"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "2", "rankDisp":"2"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "3", "rankDisp":"3"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "4", "rankDisp":"4"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "5", "rankDisp":"5"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "6", "rankDisp":"6"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "7", "rankDisp":"7"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "8", "rankDisp":"8"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "9", "rankDisp":"9"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "10", "rankDisp":"10"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "j", "rankDisp":"J"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "q", "rankDisp":"Q"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "k", "rankDisp":"K"},
-                    {"suitName":"spades", "suitImage":"♠", "rankName": "a", "rankDisp":"A"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "2", "rankDisp":"2"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "3", "rankDisp":"3"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "4", "rankDisp":"4"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "5", "rankDisp":"5"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "6", "rankDisp":"6"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "7", "rankDisp":"7"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "8", "rankDisp":"8"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "9", "rankDisp":"9"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "10", "rankDisp":"10"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "j", "rankDisp":"J"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "q", "rankDisp":"Q"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "k", "rankDisp":"K"},
-                    {"suitName":"clubs", "suitImage":"♣", "rankName": "a", "rankDisp":"A"}
-                ]
-            }
-            // Cards Removed from Standard Card Deck
-            const unused = {
-                "cards":[
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "j", "rankDisp":"J"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "q", "rankDisp":"Q"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "k", "rankDisp":"K"},
-                    {"suitName":"diams", "suitImage":"♦", "rankName": "a", "rankDisp":"A"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "j", "rankDisp":"J"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "q", "rankDisp":"Q"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "k", "rankDisp":"K"},
-                    {"suitName":"hearts", "suitImage":"♥", "rankName": "a", "rankDisp":"A"}
+                    {"suit":"Diamonds","rank": "2"},
+                    {"suit":"Diamonds","rank": "3"},
+                    {"suit":"Diamonds","rank": "4"},
+                    {"suit":"Diamonds","rank": "5"},
+                    {"suit":"Diamonds","rank": "6"},
+                    {"suit":"Diamonds","rank": "7"},
+                    {"suit":"Diamonds","rank": "8"},
+                    {"suit":"Diamonds","rank": "9"},
+                    {"suit":"Diamonds","rank": "10"},
+                    {"suit":"Hearts", "rank": "2"},
+                    {"suit":"Hearts", "rank": "3"},
+                    {"suit":"Hearts", "rank": "4"},
+                    {"suit":"Hearts", "rank": "5"},
+                    {"suit":"Hearts", "rank": "6"},
+                    {"suit":"Hearts", "rank": "7"},
+                    {"suit":"Hearts", "rank": "8"},
+                    {"suit":"Hearts", "rank": "9"},
+                    {"suit":"Hearts", "rank": "10"},
+                    {"suit":"Spades", "rank": "2"},
+                    {"suit":"Spades", "rank": "3"},
+                    {"suit":"Spades", "rank": "4"},
+                    {"suit":"Spades", "rank": "5"},
+                    {"suit":"Spades", "rank": "6"},
+                    {"suit":"Spades", "rank": "7"},
+                    {"suit":"Spades", "rank": "8"},
+                    {"suit":"Spades", "rank": "9"},
+                    {"suit":"Spades", "rank": "10"},
+                    {"suit":"Spades", "rank": "Jack"},
+                    {"suit":"Spades", "rank": "Queen"},
+                    {"suit":"Spades", "rank": "King"},
+                    {"suit":"Spades", "rank": "Ace"},
+                    {"suit":"Clubs", "rank": "2"},
+                    {"suit":"Clubs", "rank": "3"},
+                    {"suit":"Clubs", "rank": "4"},
+                    {"suit":"Clubs", "rank": "5"},
+                    {"suit":"Clubs", "rank": "6"},
+                    {"suit":"Clubs", "rank": "7"},
+                    {"suit":"Clubs", "rank": "8"},
+                    {"suit":"Clubs", "rank": "9"},
+                    {"suit":"Clubs", "rank": "10"},
+                    {"suit":"Clubs", "rank": "Jack"},
+                    {"suit":"Clubs", "rank": "Queen"},
+                    {"suit":"Clubs", "rank": "King"},
+                    {"suit":"Clubs", "rank": "Ace"}
                 ]
             }
 
-            var gameStart = false;
-            var myDeck = [];
-            var myDiscard = [];
-            var myEquipment = [];
-            var myDungeon = [];
-            var myLife = 20;
-            var myFlee = false;
-            var myDamage = 0;
-            var myDungeons = 0;
-            var myKilledMinions = 0;
-            var myMaxMinions = 99;
-            var myPotion = false;
-            var debug = false;
+            // Cards Removed from Standard Card Deck
+            const unused = {
+                "cards":[
+                    {"suit":"Diamonds","rank": "Jack"},
+                    {"suit":"Diamonds","rank": "Queen"},
+                    {"suit":"Diamonds","rank": "King"},
+                    {"suit":"Diamonds","rank": "Ace"},
+                    {"suit":"Hearts", "rank": "Jack"},
+                    {"suit":"Hearts", "rank": "Queen"},
+                    {"suit":"Hearts", "rank": "King"},
+                    {"suit":"Hearts", "rank": "Ace"}
+                ]
+            }
         </script>
+        <div id="fireworkContainer" class="hidden">
+            <div class="firework"></div>
+            <div class="firework two"></div>
+            <div class="firework three"></div>
+        </div>
     </body>
 
 </html>
